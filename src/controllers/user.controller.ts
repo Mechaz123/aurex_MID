@@ -1,24 +1,16 @@
-import { Body, Controller, Get, HttpStatus, Post, Res } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Post, Res, UseGuards, Headers } from '@nestjs/common';
 import { Response } from 'express';
+import { AuthenticationGuard } from 'src/guards/authentication.guard';
 import { User } from 'src/interfaces/user.interface';
+import { AuthenticationService } from 'src/services/authentication.service';
 import { UserService } from 'src/services/user.service';
 
 @Controller('user')
 export class UserController {
-    constructor(private readonly userService: UserService) { }
-
-    @Get("/active")
-    async getUsersActive(@Res() response: Response) {
-        try {
-            const usersActive = await this.userService.UsersActive();
-            response.status(HttpStatus.OK);
-            response.json({ Data: usersActive, Message: 'Users active loaded successfully.', Status: HttpStatus.OK, Success: true });
-        } catch (error) {
-            response.status(HttpStatus.INTERNAL_SERVER_ERROR);
-            response.json({ Data: [], Message: 'Internal server error.', Status: HttpStatus.INTERNAL_SERVER_ERROR, Success: false })
-        }
-        return response;
-    }
+    constructor(
+        private readonly userService: UserService,
+        private readonly authService: AuthenticationService,
+    ) { }
 
     @Post("/authentication")
     async postUserAuthentication(@Res() response: Response, @Body() body: Partial<User>) {
@@ -29,6 +21,40 @@ export class UserController {
         } catch (error) {
             response.status(HttpStatus.INTERNAL_SERVER_ERROR);
             response.json({Data: {}, Message: 'The body contains errors, the user cannot be authenticated.', Status: HttpStatus.INTERNAL_SERVER_ERROR, Success: false});
+        }
+        return response;
+    }
+
+    @Get("/verify_authentication")
+    async verifyUserAuthentication(@Res() response: Response, @Headers('Authorization') authHeader: string) {
+        try {
+          if(authHeader) {
+            const token = authHeader.split(' ')[1];
+            await this.authService.verifyToken(token);
+
+            response.status(HttpStatus.OK);
+            response.json({ Data: {valid: true}, Message: 'Authentication successfully verified.', Status: HttpStatus.OK, Success: true });
+          } else {
+            response.status(HttpStatus.UNAUTHORIZED);
+            response.json({ Data: {valid: false}, Message: 'No token provided.', Status: HttpStatus.UNAUTHORIZED, Success: false });
+          }
+        } catch (error) {
+            response.status(HttpStatus.UNAUTHORIZED);
+            response.json({ Data: {valid: false}, Message: 'Unauthorized user.', Status: HttpStatus.UNAUTHORIZED, Success: false })
+        }
+        return response;
+    }
+
+    @Get("/active")
+    @UseGuards(AuthenticationGuard)
+    async getUsersActive(@Res() response: Response) {
+        try {
+            const usersActive = await this.userService.UsersActive();
+            response.status(HttpStatus.OK);
+            response.json({ Data: usersActive, Message: 'Users active loaded successfully.', Status: HttpStatus.OK, Success: true });
+        } catch (error) {
+            response.status(HttpStatus.INTERNAL_SERVER_ERROR);
+            response.json({ Data: [], Message: 'Internal server error.', Status: HttpStatus.INTERNAL_SERVER_ERROR, Success: false })
         }
         return response;
     }
