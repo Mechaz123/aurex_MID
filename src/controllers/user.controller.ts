@@ -45,11 +45,12 @@ export class UserController {
         return response;
     }
 
-    @Get("/active")
     @UseGuards(AuthenticationGuard)
-    async getUsersActive(@Res() response: Response) {
+    @Get("/active")
+    async getActiveUsers(@Res() response: Response, @Headers('Authorization') authHeader: string) {
         try {
-            const usersActive = await this.userService.UsersActive();
+            const token = authHeader.split(' ')[1];
+            const usersActive = await this.userService.UsersActive(token);
             response.status(HttpStatus.OK);
             response.json({ Data: usersActive, Message: 'Users active loaded successfully.', Status: HttpStatus.OK, Success: true });
         } catch (error) {

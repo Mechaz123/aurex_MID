@@ -12,9 +12,10 @@ export class UserService {
         private authService: AuthenticationService
     ) { }
 
-    async UsersActive(): Promise<User[]> {
-        const allUsersStatus = await this.utilsService.SendGet<UserStatus[]>(process.env.AUREX_MID_AUREX_CRUD_URL, "user_status");
-        const allUsers = await this.utilsService.SendGet<User[]>(process.env.AUREX_MID_AUREX_CRUD_URL, "user");
+    async UsersActive(token: string): Promise<User[]> {
+        const headers = { Authorization: `Bearer ${token}`};
+        const allUsersStatus = await this.utilsService.SendGet<UserStatus[]>(process.env.AUREX_MID_AUREX_CRUD_URL, "user_status", headers);
+        const allUsers = await this.utilsService.SendGet<User[]>(process.env.AUREX_MID_AUREX_CRUD_URL, "user", headers);
         const userStatus = allUsersStatus.find(userStatus => userStatus.name == "Active" && userStatus.active);
 
         if (userStatus != undefined) {
@@ -26,9 +27,9 @@ export class UserService {
     }
 
     async UserAuthentication(body: any): Promise<any> {
-        const allUsersStatus = await this.utilsService.SendGet<UserStatus[]>(process.env.AUREX_MID_AUREX_CRUD_URL, "user_status");
+        const allUsersStatus = await this.utilsService.SendGet<UserStatus[]>(process.env.AUREX_MID_AUREX_CRUD_URL, "authentication/user_status");
         const userStatus = allUsersStatus.find(userStatus => userStatus.name == "Active" && userStatus.active);
-        const userData = await this.utilsService.SendGet<User>(process.env.AUREX_MID_AUREX_CRUD_URL, `user/${body.id}`);
+        const userData = await this.utilsService.SendGet<User>(process.env.AUREX_MID_AUREX_CRUD_URL, `authentication/user/${body.id}`);
 
         if (userStatus != undefined && userData != undefined) {
             if ((body.username === userData.username) && userData.user_status.id === userStatus.id && (body.hash == userData.password)) {
