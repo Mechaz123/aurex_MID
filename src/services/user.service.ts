@@ -4,6 +4,8 @@ import { UserStatus } from 'src/interfaces/user_status.interface';
 import { User } from 'src/interfaces/user.interface';
 import { error } from 'console';
 import { AuthenticationService } from './authentication.service';
+import { UserRole } from 'src/interfaces/user_role.interface';
+import { RolePermission } from 'src/interfaces/role_permission.interface';
 
 @Injectable()
 export class UserService {
@@ -41,5 +43,26 @@ export class UserService {
         } else {
             return null;
         }
+    }
+
+    async MenuOptions(id: string, token: string) {
+        let dataRolePermission = [];
+        let options = [];
+        const headers = { Authorization: `Bearer ${token}`};
+        const allUsersRole = await this.utilsService.SendGet<UserRole[]>(process.env.AUREX_MID_AUREX_CRUD_URL, "user_role", headers);
+        const allRolePermission = await this.utilsService.SendGet<RolePermission[]>(process.env.AUREX_MID_AUREX_CRUD_URL, "role_permission", headers);
+        const userRole = allUsersRole.filter(userRole => userRole.user.id == Number(id) && userRole.active);
+        for (const dataUserRole of userRole) {
+            let rolePermission = allRolePermission.filter(rolePermission => (rolePermission.role.id == dataUserRole.role.id) && (rolePermission.active));
+            dataRolePermission.push(rolePermission);
+        }
+
+        for (const RolePermission of dataRolePermission) {
+            for(const data of RolePermission) {
+                options.push(data.permission.resource);
+            }
+        }
+        
+        return options;
     }
 }
