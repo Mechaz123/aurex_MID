@@ -5,6 +5,8 @@ import { UserController } from './controllers/user.controller';
 import { UserService } from './services/user.service';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthenticationService } from './services/authentication.service';
+import { CategoryController } from './controllers/category.controller';
+import { CategoryService } from './services/category.service';
 
 @Module({
   imports: [
@@ -19,11 +21,13 @@ import { AuthenticationService } from './services/authentication.service';
   ],
   controllers: [
     UserController,
+    CategoryController,
   ],
   providers: [
     AuthenticationService,
     UtilsService,
     UserService,
+    CategoryService,
   ],
 })
 
