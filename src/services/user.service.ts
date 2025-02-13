@@ -53,7 +53,7 @@ export class UserService {
         const allRolePermission = await this.utilsService.SendGet<RolePermission[]>(process.env.AUREX_MID_AUREX_CRUD_URL, "role_permission", headers);
         const userRole = allUsersRole.filter(userRole => userRole.user.id == Number(id) && userRole.active);
         for (const dataUserRole of userRole) {
-            let rolePermission = allRolePermission.filter(rolePermission => (rolePermission.role.id == dataUserRole.role.id) && (rolePermission.active));
+            let rolePermission = allRolePermission.filter(rolePermission => (rolePermission.active) && (rolePermission.role.id == dataUserRole.role.id));
             dataRolePermission.push(rolePermission);
         }
 

@@ -7,6 +7,10 @@ import { JwtModule } from '@nestjs/jwt';
 import { AuthenticationService } from './services/authentication.service';
 import { CategoryController } from './controllers/category.controller';
 import { CategoryService } from './services/category.service';
+import { RoleController } from './controllers/role.controller';
+import { RoleService } from './services/role.service';
+import { PermissionController } from './controllers/permission.controller';
+import { PermissionService } from './services/permission.service';
 
 @Module({
   imports: [
@@ -22,12 +26,16 @@ import { CategoryService } from './services/category.service';
   controllers: [
     UserController,
     CategoryController,
+    RoleController,
+    PermissionController
   ],
   providers: [
     AuthenticationService,
     UtilsService,
     UserService,
     CategoryService,
+    RoleService,
+    PermissionService
   ],
 })
 
