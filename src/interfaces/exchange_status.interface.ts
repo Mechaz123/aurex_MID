@@ -1,7 +1,7 @@
-export interface TransactionStatus {
+export interface ExchangeStatus {
     id: number;
     name: string;
-    description?: string;
+    description: string;
     active: boolean;
     created_at: Date;
     updated_at: Date;

@@ -5,6 +5,7 @@ export interface Auction {
     id: number;
     product: Product;
     initial_price: number;
+    current_price: number;
     start_date: Date;
     end_date: Date;
     auction_status: AuctionStatus;

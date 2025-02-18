@@ -1,9 +1,7 @@
-import { Auction } from "./auction.interface";
 import { User } from "./user.interface";
 
-export interface Bid {
+export interface Credit {
     id: number;
-    auction: Auction;
     user: User;
     amount: number;
     active: boolean;
