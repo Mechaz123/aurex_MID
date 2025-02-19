@@ -20,7 +20,22 @@ export class CategoryController {
             response.json({ Data: parent_categories, Message: 'Parent categories loaded successfully.', Status: HttpStatus.OK, Success: true });
         } catch (error) {
             response.status(HttpStatus.INTERNAL_SERVER_ERROR);
-            response.json({ Data: [], Message: 'Internal server error.', Status: HttpStatus.INTERNAL_SERVER_ERROR, Success: false })
+            response.json({ Data: [], Message: 'Internal server error.', Status: HttpStatus.INTERNAL_SERVER_ERROR, Success: false });
+        }
+    }
+
+    @UseGuards(AuthenticationGuard)
+    @Get("/secondary_categories")
+    async getSecondaryCategories(@Res() response: Response, @Headers('Authorization') authHeader: string) {
+        try {
+            const token = authHeader.split(' ')[1];
+            const secondary_categories = await this.categoryService.SecondaryCategories(token);
+
+            response.status(HttpStatus.OK);
+            response.json({ Data: secondary_categories, Message: 'Secondary categories loaded successfully.', Status: HttpStatus.OK, Success: true });
+        } catch (error) {
+            response.status(HttpStatus.INTERNAL_SERVER_ERROR);
+            response.json({ Data: [], Message: 'Internal server error.', Status: HttpStatus.INTERNAL_SERVER_ERROR, Success: false });
         }
     }
 }
