@@ -1,10 +1,10 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { Observable } from 'rxjs';
-import { AuthenticationService } from 'src/services/authentication.service';
+import { AutenticacionService } from 'src/services/autenticacion.service';
 
 @Injectable()
-export class AuthenticationGuard implements CanActivate {
-  constructor(private readonly authService: AuthenticationService) { }
+export class AutenticacionGuard implements CanActivate {
+  constructor(private readonly authService: AutenticacionService) { }
 
   canActivate(
     context: ExecutionContext,
@@ -13,13 +13,13 @@ export class AuthenticationGuard implements CanActivate {
     const token = request.headers.authorization?.split(' ')[1];
 
     if (!token) {
-      throw new UnauthorizedException('Token not provided.');
+      throw new UnauthorizedException('Token no obtenido.');
     }
     
-    return this.authService.verifyToken(token)
+    return this.authService.verificarToken(token)
     .then(() => true)
     .catch(() => {
-      throw new UnauthorizedException('Invalid token.');
+      throw new UnauthorizedException('Token invalido.');
     });
   }
 }

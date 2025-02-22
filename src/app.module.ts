@@ -1,16 +1,16 @@
 import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
 import { UtilsService } from './services/utils.service';
-import { UserController } from './controllers/user.controller';
-import { UserService } from './services/user.service';
 import { JwtModule } from '@nestjs/jwt';
-import { AuthenticationService } from './services/authentication.service';
-import { CategoryController } from './controllers/category.controller';
-import { CategoryService } from './services/category.service';
-import { RoleController } from './controllers/role.controller';
-import { RoleService } from './services/role.service';
-import { PermissionController } from './controllers/permission.controller';
-import { PermissionService } from './services/permission.service';
+import { UsuarioController } from './controllers/usuario.controller';
+import { CategoriaController } from './controllers/categoria.controller';
+import { RolController } from './controllers/rol.controller';
+import { PermisoController } from './controllers/permiso.controller';
+import { AutenticacionService } from './services/autenticacion.service';
+import { UsuarioService } from './services/usuario.service';
+import { CategoriaService } from './services/categoria.service';
+import { RolService } from './services/rol.service';
+import { PermisoService } from './services/permiso.service';
 
 @Module({
   imports: [
@@ -24,18 +24,18 @@ import { PermissionService } from './services/permission.service';
     }),
   ],
   controllers: [
-    UserController,
-    CategoryController,
-    RoleController,
-    PermissionController
+    UsuarioController,
+    CategoriaController,
+    RolController,
+    PermisoController
   ],
   providers: [
-    AuthenticationService,
+    AutenticacionService,
     UtilsService,
-    UserService,
-    CategoryService,
-    RoleService,
-    PermissionService
+    UsuarioService,
+    CategoriaService,
+    RolService,
+    PermisoService
   ],
 })
 
