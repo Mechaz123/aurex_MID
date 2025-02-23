@@ -33,14 +33,14 @@ export class UsuarioController {
             await this.authService.verificarToken(token);
 
             response.status(HttpStatus.OK);
-            response.json({ Data: {valid: true}, Message: 'Autenticacion correctamente verificada.', Status: HttpStatus.OK, Success: true });
+            response.json({ Data: {valido: true}, Message: 'Autenticacion correctamente verificada.', Status: HttpStatus.OK, Success: true });
           } else {
             response.status(HttpStatus.UNAUTHORIZED);
-            response.json({ Data: {valid: false}, Message: 'No se encontro el token.', Status: HttpStatus.UNAUTHORIZED, Success: false });
+            response.json({ Data: {valido: false}, Message: 'No se encontro el token.', Status: HttpStatus.UNAUTHORIZED, Success: false });
           }
         } catch (error) {
             response.status(HttpStatus.UNAUTHORIZED);
-            response.json({ Data: {valid: false}, Message: 'Usuario no autorizado.', Status: HttpStatus.UNAUTHORIZED, Success: false })
+            response.json({ Data: {valido: false}, Message: 'Usuario no autorizado.', Status: HttpStatus.UNAUTHORIZED, Success: false })
         }
         return response;
     }
