@@ -11,6 +11,8 @@ import { UsuarioService } from './services/usuario.service';
 import { CategoriaService } from './services/categoria.service';
 import { RolService } from './services/rol.service';
 import { PermisoService } from './services/permiso.service';
+import { ProductoController } from './controllers/producto.controller';
+import { ProductoService } from './services/producto.service';
 
 @Module({
   imports: [
@@ -27,7 +29,8 @@ import { PermisoService } from './services/permiso.service';
     UsuarioController,
     CategoriaController,
     RolController,
-    PermisoController
+    PermisoController,
+    ProductoController,
   ],
   providers: [
     AutenticacionService,
@@ -35,7 +38,8 @@ import { PermisoService } from './services/permiso.service';
     UsuarioService,
     CategoriaService,
     RolService,
-    PermisoService
+    PermisoService,
+    ProductoService,
   ],
 })
 
