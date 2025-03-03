@@ -50,4 +50,18 @@ export class ProductoController {
             response.json({ Data: [], Message: 'Error interno del servidor.', Status: HttpStatus.INTERNAL_SERVER_ERROR, Success: false });
         }
     }
+
+    @UseGuards(AutenticacionGuard)
+    @Get("donacion/propietario/:id")
+    async getProductosDonacionPropietario(@Res() response: Response, @Param('id') id: string, @Headers('Authorization') authHeader: string) {
+        try {
+            const token = authHeader.split(' ')[1];
+            const dataProductosPropietario = await this.productoService.getProductosDonacionPropietario(id, token);
+            response.status(HttpStatus.OK);
+            response.json({ Data: dataProductosPropietario, Message: 'Los productos para intercambio del propietario fueron cargados.', Status: HttpStatus.OK, Success: true });
+        } catch (error) {
+            response.status(HttpStatus.INTERNAL_SERVER_ERROR);
+            response.json({ Data: [], Message: 'Error interno del servidor.', Status: HttpStatus.INTERNAL_SERVER_ERROR, Success: false });
+        }
+    }
 }
