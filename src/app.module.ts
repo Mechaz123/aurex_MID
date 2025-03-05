@@ -13,6 +13,8 @@ import { RolService } from './services/rol.service';
 import { PermisoService } from './services/permiso.service';
 import { ProductoController } from './controllers/producto.controller';
 import { ProductoService } from './services/producto.service';
+import { EmailController } from './controllers/email.controller';
+import { EmailService } from './services/email.service';
 
 @Module({
   imports: [
@@ -22,7 +24,7 @@ import { ProductoService } from './services/producto.service';
     }),
     JwtModule.register({
       secret: process.env.SECRET_KEY,
-      signOptions: { expiresIn: '1h'}
+      signOptions: { expiresIn: '1h' }
     }),
   ],
   controllers: [
@@ -31,6 +33,7 @@ import { ProductoService } from './services/producto.service';
     RolController,
     PermisoController,
     ProductoController,
+    EmailController,
   ],
   providers: [
     AutenticacionService,
@@ -40,7 +43,8 @@ import { ProductoService } from './services/producto.service';
     RolService,
     PermisoService,
     ProductoService,
+    EmailService
   ],
 })
 
-export class AppModule {}
+export class AppModule { }
