@@ -18,7 +18,7 @@ export class CategoriaService {
     async CategoriasSecundarias(token: string): Promise<Categoria[]> {
         const headers = { Authorization: `Bearer ${token}`};
         const todasCategorias = await this.utilsService.SendGet<Categoria[]>(process.env.AUREX_MID_AUREX_CRUD_URL, "categoria", headers);
-        const categoriasSecundarias = todasCategorias.filter(categoria => (categoria.categoria_principal != null) && categoria.activo).sort((a, b) => a.nombre.localeCompare(b.nombre));
+        const categoriasSecundarias = todasCategorias.filter(categoria => (categoria.categoria_principal != null) && categoria.activo && categoria.categoria_principal.activo).sort((a, b) => a.nombre.localeCompare(b.nombre));
         return categoriasSecundarias;
     }
 }

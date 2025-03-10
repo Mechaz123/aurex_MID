@@ -73,4 +73,18 @@ export class UsuarioController {
             response.json({ Data: [], Message: 'Error interno del servidor.', Status: HttpStatus.INTERNAL_SERVER_ERROR, Success: false });
         }
     }
+
+    @UseGuards(AutenticacionGuard)
+    @Get("/:id/roles")
+    async getUsuarioRoles(@Res() response: Response, @Param('id') id: string, @Headers('Authorization') authHeader: string) {
+        try {
+            const token = authHeader.split(' ')[1];
+            const usuarioRoles = await this.usuarioService.UsuarioRoles(id, token);
+            response.status(HttpStatus.OK);
+            response.json({ Data: usuarioRoles, Message: 'Los roles del usuario han sido cargados exitosamente.', Status: HttpStatus.OK, Success: true });
+        } catch (error) {
+            response.status(HttpStatus.INTERNAL_SERVER_ERROR);
+            response.json({ Data: [], Message: 'Error interno del servidor.', Status: HttpStatus.INTERNAL_SERVER_ERROR, Success: false });
+        }
+    }
 }

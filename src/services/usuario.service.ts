@@ -51,7 +51,8 @@ export class UsuarioService {
         const headers = { Authorization: `Bearer ${token}`};
         const todosUsuariosRoles = await this.utilsService.SendGet<UsuarioRol[]>(process.env.AUREX_MID_AUREX_CRUD_URL, "usuario_rol", headers);
         const todosRolesPermisos = await this.utilsService.SendGet<RolPermiso[]>(process.env.AUREX_MID_AUREX_CRUD_URL, "rol_permiso", headers);
-        const usuarioRol = todosUsuariosRoles.filter(usuarioRol => usuarioRol.usuario.id == Number(id) && usuarioRol.activo);
+        const usuarioRol = todosUsuariosRoles.filter(usuarioRol => usuarioRol.usuario.id == Number(id) && usuarioRol.activo && usuarioRol.rol.activo);
+
         for (const dataUsuarioRol of usuarioRol) {
             let rolPermiso = todosRolesPermisos.filter(rolPermiso => (rolPermiso.activo) && (rolPermiso.rol.id == dataUsuarioRol.rol.id));
             dataRolPermiso.push(rolPermiso);
@@ -64,5 +65,12 @@ export class UsuarioService {
         }
         
         return opciones;
+    }
+    
+    async UsuarioRoles(id: string, token: string) {
+        const headers = { Authorization: `Bearer ${token}`};
+        const todosUsuariosRoles = await this.utilsService.SendGet<UsuarioRol[]>(process.env.AUREX_MID_AUREX_CRUD_URL, "usuario_rol", headers);
+        const usuarioRoles = todosUsuariosRoles.filter(usuarioRol => usuarioRol.usuario.id == Number(id));
+        return usuarioRoles;
     }
 }

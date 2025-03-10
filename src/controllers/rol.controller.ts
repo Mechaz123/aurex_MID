@@ -22,4 +22,18 @@ export class RolController {
             response.json({ Data: [], Message: 'Error interno del servidor.', Status: HttpStatus.INTERNAL_SERVER_ERROR, Success: false });
         }
     }
+
+    @UseGuards(AutenticacionGuard)
+    @Get("/activos")
+    async getRolesActivos(@Res() response: Response, @Headers('Authorization') authHeader: string) {
+        try {
+            const token = authHeader.split(' ')[1];
+            const dataRolesActivos = await this.rolService.getRolesActivos(token);
+            response.status(HttpStatus.OK);
+            response.json({ Data: dataRolesActivos, Message: 'Los roles activos han cargado exitosamente.', Status: HttpStatus.OK, Success: true });
+        } catch (error) {
+            response.status(HttpStatus.INTERNAL_SERVER_ERROR);
+            response.json({ Data: [], Message: 'Error interno del servidor.', Status: HttpStatus.INTERNAL_SERVER_ERROR, Success: false });
+        }
+    }
 }
