@@ -45,7 +45,26 @@ export class UsuarioService {
         }
     }
 
-    async MenuOpciones(id: string, token: string) {
+    async Usuario(id: string, token: string): Promise<Usuario> {
+        const headers = { Authorization: `Bearer ${token}`};
+        let usuarioData = await this.utilsService.SendGet<Usuario>(process.env.AUREX_MID_AUREX_CRUD_URL, `usuario/${id}`, headers);
+        usuarioData.clave = null;
+        return usuarioData;
+    }
+
+    async UsuariosTodos(token: string): Promise<any> {
+        let dataUsuarios =[];
+        const headers = { Authorization: `Bearer ${token}`};
+        const usuariosTodosData = await this.utilsService.SendGet<Usuario[]>(process.env.AUREX_MID_AUREX_CRUD_URL, `usuario`, headers);
+
+        for (let data of usuariosTodosData) {
+            data.clave = null;
+            dataUsuarios.push(data);
+        }
+        return dataUsuarios;
+    }
+
+    async MenuOpciones(id: string, token: string): Promise<any> {
         let dataRolPermiso = [];
         let opciones = [];
         const headers = { Authorization: `Bearer ${token}`};
@@ -67,7 +86,7 @@ export class UsuarioService {
         return opciones;
     }
     
-    async UsuarioRoles(id: string, token: string) {
+    async UsuarioRoles(id: string, token: string): Promise<UsuarioRol[]> {
         const headers = { Authorization: `Bearer ${token}`};
         const todosUsuariosRoles = await this.utilsService.SendGet<UsuarioRol[]>(process.env.AUREX_MID_AUREX_CRUD_URL, "usuario_rol", headers);
         const usuarioRoles = todosUsuariosRoles.filter(usuarioRol => usuarioRol.usuario.id == Number(id));

@@ -12,21 +12,8 @@ export class UsuarioController {
         private readonly authService: AutenticacionService,
     ) { }
 
-    @Post("/autenticacion")
-    async postUsuarioAutenticacion(@Res() response: Response, @Body() body: Partial<Usuario>) {
-        try {
-            const usuarioAutenticacion = await this.usuarioService.AutenticacionUsuario(body);
-            response.status(HttpStatus.OK);
-            response.json({ Data: usuarioAutenticacion, Message: 'El usuario fue autenticado.', Status: HttpStatus.OK, Success: true});
-        } catch (error) {
-            response.status(HttpStatus.INTERNAL_SERVER_ERROR);
-            response.json({Data: {}, Message: 'El body contiene errores, el usuario no pudo ser autenticado.', Status: HttpStatus.INTERNAL_SERVER_ERROR, Success: false});
-        }
-        return response;
-    }
-
     @Get("/verificar_autenticacion")
-    async verificarUsuarioAutenticacion(@Res() response: Response, @Headers('Authorization') authHeader: string) {
+    async getVerificarUsuarioAutenticacion(@Res() response: Response, @Headers('Authorization') authHeader: string) {
         try {
           if(authHeader) {
             const token = authHeader.split(' ')[1];
@@ -40,7 +27,7 @@ export class UsuarioController {
           }
         } catch (error) {
             response.status(HttpStatus.UNAUTHORIZED);
-            response.json({ Data: {valido: false}, Message: 'Usuario no autorizado.', Status: HttpStatus.UNAUTHORIZED, Success: false })
+            response.json({ Data: {valido: false}, Message: 'Usuario no autorizado.', Status: HttpStatus.UNAUTHORIZED, Success: false });
         }
         return response;
     }
@@ -55,9 +42,38 @@ export class UsuarioController {
             response.json({ Data: usuariosActivos, Message: 'Usuarios activos cargados exitosamente.', Status: HttpStatus.OK, Success: true });
         } catch (error) {
             response.status(HttpStatus.INTERNAL_SERVER_ERROR);
-            response.json({ Data: [], Message: 'Error interno del servidor.', Status: HttpStatus.INTERNAL_SERVER_ERROR, Success: false })
+            response.json({ Data: [], Message: 'Error interno del servidor.', Status: HttpStatus.INTERNAL_SERVER_ERROR, Success: false });
         }
         return response;
+    }
+
+    @UseGuards(AutenticacionGuard)
+    @Get("/todos")
+    async getConsultarUsuariosTodos(@Res() response: Response, @Headers('Authorization') authHeader: string) {
+        try {
+            const token = authHeader.split(' ')[1];
+            const usuariosTodos = await this.usuarioService.UsuariosTodos(token);
+            response.status(HttpStatus.OK);
+            response.json({ Data: usuariosTodos, Message: 'Usuarios cargados exitosamente.', Status: HttpStatus.OK, Success: true });
+        } catch (error) {
+            response.status(HttpStatus.INTERNAL_SERVER_ERROR);
+            response.json({ Data: [], Message: 'Error interno del servidor.', Status: HttpStatus.INTERNAL_SERVER_ERROR, Success: false });
+        }
+        return response;
+    }
+
+    @UseGuards(AutenticacionGuard)
+    @Get("/consultar/:id")
+    async getConsultarUsuario(@Res() response: Response, @Param('id') id: string, @Headers('Authorization') authHeader: string) {
+        try {
+            const token = authHeader.split(' ')[1];
+            const usuarioData = await this.usuarioService.Usuario(id, token);
+            response.status(HttpStatus.OK);
+            response.json({ Data: usuarioData, Message: 'Usuario cargado exitosamente.', Status: HttpStatus.OK, Success: true });
+        } catch (error) {
+            response.status(HttpStatus.INTERNAL_SERVER_ERROR);
+            response.json({ Data: [], Message: 'Error interno del servidor.', Status: HttpStatus.INTERNAL_SERVER_ERROR, Success: false }); 
+        }
     }
 
     @UseGuards(AutenticacionGuard)
@@ -86,5 +102,18 @@ export class UsuarioController {
             response.status(HttpStatus.INTERNAL_SERVER_ERROR);
             response.json({ Data: [], Message: 'Error interno del servidor.', Status: HttpStatus.INTERNAL_SERVER_ERROR, Success: false });
         }
+    }
+
+    @Post("/autenticacion")
+    async postUsuarioAutenticacion(@Res() response: Response, @Body() body: Partial<Usuario>) {
+        try {
+            const usuarioAutenticacion = await this.usuarioService.AutenticacionUsuario(body);
+            response.status(HttpStatus.OK);
+            response.json({ Data: usuarioAutenticacion, Message: 'El usuario fue autenticado.', Status: HttpStatus.OK, Success: true});
+        } catch (error) {
+            response.status(HttpStatus.INTERNAL_SERVER_ERROR);
+            response.json({Data: {}, Message: 'El body contiene errores, el usuario no pudo ser autenticado.', Status: HttpStatus.INTERNAL_SERVER_ERROR, Success: false});
+        }
+        return response;
     }
 }
