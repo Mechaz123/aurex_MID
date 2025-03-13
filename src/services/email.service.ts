@@ -48,6 +48,8 @@ export class EmailService {
             html = this.loadHtmlTemplate("terminos_y_condiciones", content);
         } else if (subject == "USUARIO REGISTRADO EN AUREX") {
             html = this.loadHtmlTemplate("usuario_registrado", content);
+        } else if (subject == "INGRESO DE DINERO A CUENTA") {
+            html = this.loadHtmlTemplate("deposito_dinero", content);
         }
 
         const mailOptions = {
