@@ -50,6 +50,10 @@ export class EmailService {
             html = this.loadHtmlTemplate("usuario_registrado", content);
         } else if (subject == "INGRESO DE DINERO A CUENTA") {
             html = this.loadHtmlTemplate("deposito_dinero", content);
+        } else if (subject == "GENERACIÓN DE SOLICITUD DE COMPRA") {
+            html = this.loadHtmlTemplate("generacion_solicitud_compra", content);
+        } else if (subject == "GENERACIÓN DE SOLICITUD DE VENTA") {
+            html = this.loadHtmlTemplate("generacion_solicitud_venta", content);
         }
 
         const mailOptions = {

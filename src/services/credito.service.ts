@@ -41,7 +41,8 @@ export class CreditoService {
     async ConsultarMonto(id: string, token: string): Promise<Credito>{
         const headers = { Authorization: `Bearer ${token}`};
         const todosCreditos = await this.utilsService.SendGet<Credito[]>(process.env.AUREX_MID_AUREX_CRUD_URL, "credito", headers);
-        const creditoUsuario = todosCreditos.find(credito => (credito.usuario.id) == Number(id));
+        let creditoUsuario = todosCreditos.find(credito => (credito.usuario.id) == Number(id));
+        creditoUsuario.usuario.clave = null;
         return creditoUsuario;
     }
 }

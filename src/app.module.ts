@@ -17,6 +17,8 @@ import { EmailController } from './controllers/email.controller';
 import { EmailService } from './services/email.service';
 import { CreditoController } from './controllers/credito.controller';
 import { CreditoService } from './services/credito.service';
+import { PedidoController } from './controllers/pedido.controller';
+import { PedidoService } from './services/pedido.service';
 
 @Module({
   imports: [
@@ -36,7 +38,8 @@ import { CreditoService } from './services/credito.service';
     PermisoController,
     ProductoController,
     EmailController,
-    CreditoController
+    CreditoController,
+    PedidoController,
   ],
   providers: [
     AutenticacionService,
@@ -47,7 +50,8 @@ import { CreditoService } from './services/credito.service';
     PermisoService,
     ProductoService,
     EmailService,
-    CreditoService
+    CreditoService,
+    PedidoService
   ],
 })
 

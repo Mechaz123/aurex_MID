@@ -10,7 +10,21 @@ export class ProductoController {
     ) { }
 
     @UseGuards(AutenticacionGuard)
-    @Get("venta/propietario/:id")
+    @Get("/venta")
+    async getProductosVenta(@Res() response: Response, @Headers('Authorization') authHeader: string) {
+        try {
+            const token = authHeader.split(' ')[1];
+            const dataProductosVenta = await this.productoService.getProductosVenta(token);
+            response.status(HttpStatus.OK);
+            response.json({ Data: dataProductosVenta, Message: 'Los productos en venta han sido cargados exitosamente.', Status: HttpStatus.OK, Success: true });
+        } catch (error) {
+            response.status(HttpStatus.INTERNAL_SERVER_ERROR);
+            response.json({ Data: [], Message: 'Error interno del servidor.', Status: HttpStatus.INTERNAL_SERVER_ERROR, Success: false });
+        }
+    }
+
+    @UseGuards(AutenticacionGuard)
+    @Get("/venta/propietario/:id")
     async getProductosVentaPropietario(@Res() response: Response, @Param('id') id: string, @Headers('Authorization') authHeader: string) {
         try {
             const token = authHeader.split(' ')[1];
@@ -24,7 +38,7 @@ export class ProductoController {
     }
 
     @UseGuards(AutenticacionGuard)
-    @Get("intercambio/propietario/:id")
+    @Get("/intercambio/propietario/:id")
     async getProductosIntercambioPropietario(@Res() response: Response, @Param('id') id: string, @Headers('Authorization') authHeader: string) {
         try {
             const token = authHeader.split(' ')[1];
@@ -38,7 +52,7 @@ export class ProductoController {
     }
 
     @UseGuards(AutenticacionGuard)
-    @Get("subasta/propietario/:id")
+    @Get("/subasta/propietario/:id")
     async getProductosSubastaPropietario(@Res() response: Response, @Param('id') id: string, @Headers('Authorization') authHeader: string) {
         try {
             const token = authHeader.split(' ')[1];
@@ -52,7 +66,7 @@ export class ProductoController {
     }
 
     @UseGuards(AutenticacionGuard)
-    @Get("donacion/propietario/:id")
+    @Get("/donacion/propietario/:id")
     async getProductosDonacionPropietario(@Res() response: Response, @Param('id') id: string, @Headers('Authorization') authHeader: string) {
         try {
             const token = authHeader.split(' ')[1];
