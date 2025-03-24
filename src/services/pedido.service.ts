@@ -82,7 +82,7 @@ export class PedidoService {
                                 "tipo": "Compra",
                                 "monto": totalPago,
                                 "pedido": pedidoCreado,
-                                "confirmacion": true,
+                                "confirmacion": false,
                             }
 
                             const historialTransaccionCompradorCreado = await this.utilsService.SendPost<HistorialTransaccion, Partial<HistorialTransaccion>>(process.env.AUREX_MID_AUREX_CRUD_URL, `historial_transaccion`, dataHistorialTransaccion, headers);
@@ -117,6 +117,149 @@ export class PedidoService {
             }
         } else {
             throw new Error("No se pudo obtener el credito del usuario.");
+        }
+    }
+
+    async ProductosPedidoPropietario(id: string, token: string): Promise<DetallePedido[]> {
+        const headers = { Authorization: `Bearer ${token}` };
+        const todosEstadoPedido = await this.utilsService.SendGet<EstadoPedido[]>(process.env.AUREX_MID_AUREX_CRUD_URL, `estado_pedido`, headers);
+        const estadoPedidoEntregado = todosEstadoPedido.find(estadoPedido => (estadoPedido.nombre == "Entregado") && estadoPedido.activo);
+        const todosDetallePedido = await this.utilsService.SendGet<DetallePedido[]>(process.env.AUREX_MID_AUREX_CRUD_URL, `detalle_pedido`, headers);
+        const detallePedidosPropietarioProducto = todosDetallePedido.filter( detallePedido => (detallePedido.producto.propietario.id == Number(id)) && (detallePedido.pedido.estado_pedido.id != estadoPedidoEntregado.id));
+
+        for (const detallePedido of detallePedidosPropietarioProducto) {
+            detallePedido.pedido.usuario.clave = null;
+            detallePedido.producto.propietario.clave = null;
+            detallePedido.pedido.fecha_orden = await this.utilsService.formatDate(detallePedido.pedido.fecha_orden);
+        }
+        
+        return detallePedidosPropietarioProducto;
+    }
+
+    async ConfirmarEnvio(id: string, token: string) {
+        const headers = { Authorization: `Bearer ${token}` };
+        const pedido = await this.utilsService.SendGet<Pedido>(process.env.AUREX_MID_AUREX_CRUD_URL, `pedido/${id}`, headers);
+        const todosEstadoPedido = await this.utilsService.SendGet<EstadoPedido[]>(process.env.AUREX_MID_AUREX_CRUD_URL, `estado_pedido`, headers);
+        const estadoPedidoEnviado = todosEstadoPedido.find(estadoPedido => (estadoPedido.nombre == "Enviado") && estadoPedido.activo);
+        const todosHistorialTransaccion = await this.utilsService.SendGet<HistorialTransaccion[]>(process.env.AUREX_MID_AUREX_CRUD_URL, `historial_transaccion`, headers);
+        const ventaHistorialTransaccion = todosHistorialTransaccion.find(historialTransaccion => (historialTransaccion.tipo == "Venta") && (historialTransaccion.pedido.id == Number(id)));
+
+        if (pedido) {
+            if (estadoPedidoEnviado) {
+                let dataPedido = pedido;
+                dataPedido.estado_pedido = estadoPedidoEnviado;
+
+                const pedidoActualizado = await this.utilsService.SendPut<Pedido, Pedido>(process.env.AUREX_MID_AUREX_CRUD_URL, `pedido/${id}`, dataPedido, headers);
+
+                if (pedidoActualizado) {
+                    let dataHistorialTransaccion = ventaHistorialTransaccion;
+                    dataHistorialTransaccion.confirmacion = true;
+
+                    const historialTransaccionActualizado = await this.utilsService.SendPut<HistorialTransaccion, HistorialTransaccion>(process.env.AUREX_MID_AUREX_CRUD_URL, `historial_transaccion/${ventaHistorialTransaccion.id}`, dataHistorialTransaccion, headers);
+
+                    if (!historialTransaccionActualizado) {
+                        throw new Error("Ocurrió un error al intentar actualizar el historial de transacción de tipo venta.");
+                    }
+
+                    await this.emailService.EnviarEmail(pedido.usuario.correo, "PEDIDO ENVIADO", null);
+                } else {
+                    throw new Error("Ocurrió un error al intentar actualizar el pedido.");
+                }
+            } else {
+                throw new Error("No se pudo obtener el estado Enviado de los estados de pedido.");
+            }
+        } else {
+            throw new Error("No se pudo obtener el pedido.");
+        }
+    }
+
+    async HistorialCompra(id: string, token: string) {
+        const headers = { Authorization: `Bearer ${token}` };
+        const todosDetallePedido = await this.utilsService.SendGet<DetallePedido[]>(process.env.AUREX_MID_AUREX_CRUD_URL, `detalle_pedido`, headers);
+        const detallePedidoCompras = todosDetallePedido.filter(detallePedido => detallePedido.pedido.usuario.id == Number(id))
+
+        for (const detallePedido of detallePedidoCompras) {
+            detallePedido.pedido.usuario.clave = null;
+            detallePedido.producto.propietario.clave = null;
+            detallePedido.pedido.fecha_orden = await this.utilsService.formatDate(detallePedido.pedido.fecha_orden);
+        }
+
+        return detallePedidoCompras;
+    }
+
+    async ConfirmarEntrega(idPedido: string, idVendedor: string, token: string) {
+        const headers = { Authorization: `Bearer ${token}` };
+        const pedido = await this.utilsService.SendGet<Pedido>(process.env.AUREX_MID_AUREX_CRUD_URL, `pedido/${idPedido}`, headers);
+        const todosEstadoPedido = await this.utilsService.SendGet<EstadoPedido[]>(process.env.AUREX_MID_AUREX_CRUD_URL, `estado_pedido`, headers);
+        const estadoPedidoEntregado = todosEstadoPedido.find(estadoPedido => (estadoPedido.nombre == "Entregado") && estadoPedido.activo);
+        const todosHistorialTransaccion = await this.utilsService.SendGet<HistorialTransaccion[]>(process.env.AUREX_MID_AUREX_CRUD_URL, `historial_transaccion`, headers);
+        const compraHistorialTransaccion = todosHistorialTransaccion.find(historialTransaccion => (historialTransaccion.tipo == "Compra") && (historialTransaccion.pedido.id == Number(idPedido)));
+        const todosCreditoBloqueado = await this.utilsService.SendGet<CreditoBloqueado[]>(process.env.AUREX_MID_AUREX_CRUD_URL, `credito_bloqueado`, headers);
+        const pedidoCreditoBloqueado = todosCreditoBloqueado.find(creditoBloqueado => (creditoBloqueado.pedido.id == Number(idPedido)));
+        const todosCredito = await this.utilsService.SendGet<Credito[]>(process.env.AUREX_MID_AUREX_CRUD_URL, `credito`, headers);
+        const creditoVendedor = todosCredito.find(credito => (credito.usuario.id == Number(idVendedor)) && (credito.activo));
+        const todosDetallePedido = await this.utilsService.SendGet<DetallePedido[]>(process.env.AUREX_MID_AUREX_CRUD_URL, `detalle_pedido`, headers);
+        const detallePedido = todosDetallePedido.find(detallePedido => (detallePedido.pedido.id == Number(idPedido)));
+        const productoComprado = await this.utilsService.SendGet<Producto>(process.env.AUREX_MID_AUREX_CRUD_URL, `producto/${detallePedido.producto.id}`, headers);
+
+        if (pedido) {
+            if (estadoPedidoEntregado) {
+                let dataPedido = pedido;
+                dataPedido.estado_pedido = estadoPedidoEntregado;
+
+                const pedidoActualizado = await this.utilsService.SendPut<Pedido, Pedido>(process.env.AUREX_MID_AUREX_CRUD_URL, `pedido/${idPedido}`, dataPedido, headers);
+
+                if (pedidoActualizado) {
+                    let dataHistorialTransaccion = compraHistorialTransaccion;
+                    dataHistorialTransaccion.confirmacion = true;
+
+                    const historialTransaccionActualizado = await this.utilsService.SendPut<HistorialTransaccion, HistorialTransaccion>(process.env.AUREX_MID_AUREX_CRUD_URL, `historial_transaccion/${compraHistorialTransaccion.id}`, dataHistorialTransaccion, headers);
+
+                    if (historialTransaccionActualizado) {
+                        let dataCreditoVendedor = creditoVendedor;
+                        dataCreditoVendedor.monto = Number(dataCreditoVendedor.monto) + Number(pedidoCreditoBloqueado.monto_bloqueado);
+
+                        const creditoVendedorActualizado = await this.utilsService.SendPut<Credito, Credito>(process.env.AUREX_MID_AUREX_CRUD_URL, `credito/${creditoVendedor.id}`, dataCreditoVendedor, headers);
+
+                        if (creditoVendedorActualizado) {
+                            let datapedidoCreditoBloqueado = pedidoCreditoBloqueado;
+                            datapedidoCreditoBloqueado.activo = false;
+
+                            const creditoBloqueadoActualizado = await this.utilsService.SendPut<CreditoBloqueado, CreditoBloqueado>(process.env.AUREX_MID_AUREX_CRUD_URL, `credito_bloqueado/${pedidoCreditoBloqueado.id}`, datapedidoCreditoBloqueado, headers);
+
+                            if (creditoBloqueadoActualizado) {
+                                let dataProductoComprado = productoComprado;
+                                dataProductoComprado.existencias = Number(dataProductoComprado.existencias) - Number(detallePedido.cantidad);
+
+                                const productoCompradoActualizado = await this.utilsService.SendPut<Producto, Producto>(process.env.AUREX_MID_AUREX_CRUD_URL, `producto/${productoComprado.id}`, dataProductoComprado, headers);
+
+                                if (!productoCompradoActualizado) {
+                                    throw new Error("No se pudo actualizar el producto.");
+                                }
+
+                                const dataEmail = {
+                                    "nombre_producto": productoComprado.nombre,
+                                    "direccion": pedido.usuario.direccion,
+                                    "monto_total": pedido.monto_total
+                                }
+                                await this.emailService.EnviarEmail(productoComprado.propietario.correo, "PEDIDO ENTREGADO", dataEmail);
+                            } else {
+                                throw new Error("No se pudo actualizar el credito bloqueado.");
+                            }
+                        } else {
+                            throw new Error("No se pudo actualizar el credito del Vendedor.");
+                        }
+                    } else {
+                        throw new Error("No se pudo actualizar el historial de transacción.");
+                    }
+                } else {
+                    throw new Error("No se pudo actualizar el pedido.");
+                }
+            } else {
+                throw new Error("No se pudo obtener el estado Entregado de los estados de pedido.");
+            }
+        } else {
+            throw new Error("No se pudo obtener el pedido.");
         }
     }
 }

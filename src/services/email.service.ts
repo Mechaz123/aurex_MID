@@ -54,6 +54,10 @@ export class EmailService {
             html = this.loadHtmlTemplate("generacion_solicitud_compra", content);
         } else if (subject == "GENERACIÓN DE SOLICITUD DE VENTA") {
             html = this.loadHtmlTemplate("generacion_solicitud_venta", content);
+        } else if (subject == "PEDIDO ENVIADO") {
+            html = this.loadHtmlTemplate("pedido_enviado", content);
+        } else if (subject == "PEDIDO ENTREGADO") {
+            html = this.loadHtmlTemplate("pedido_entregado", content);
         }
 
         const mailOptions = {

@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { lastValueFrom } from 'rxjs';
+import { toZonedTime } from 'date-fns-tz';
+
 
 @Injectable()
 export class UtilsService {
@@ -67,5 +69,15 @@ export class UtilsService {
         } catch (error) {
             throw new Error(`DELETE request failed.`);
         }
+    }
+
+    async formatDate (fechaISO: Date): Promise<Date> {
+        if (fechaISO) {
+            const zonaHoraria = 'America/Bogota';
+            const fechaZonificada = toZonedTime(fechaISO, zonaHoraria);
+            return fechaZonificada;
+        } else {
+            return fechaISO;
+        } 
     }
 }
