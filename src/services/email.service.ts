@@ -58,6 +58,12 @@ export class EmailService {
             html = this.loadHtmlTemplate("pedido_enviado", content);
         } else if (subject == "PEDIDO ENTREGADO") {
             html = this.loadHtmlTemplate("pedido_entregado", content);
+        } else if (subject == "NUEVA SOLICITUD DE INTERCAMBIO") {
+            html = this.loadHtmlTemplate("nueva_solicitud_intercambio", content);
+        } else if (subject == "SOLICITUD DE INTERCAMBIO RECHAZADA") {
+            html = this.loadHtmlTemplate("solicitud_intercambio_rechazada", content);
+        } else if (subject == "SOLICITUD DE INTERCAMBIO ACEPTADA") {
+            html = this.loadHtmlTemplate("solicitud_intercambio_aceptada", content);
         }
 
         const mailOptions = {

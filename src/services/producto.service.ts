@@ -15,6 +15,13 @@ export class ProductoService {
         return productosVenta;
     }
 
+    async getProductosIntercambio(id: string, token: string): Promise<Producto[]> {
+        const headers = { Authorization: `Bearer ${token}`};
+        const todosProductos = await this.utilsService.SendGet<Producto[]>(process.env.AUREX_MID_AUREX_CRUD_URL, "producto", headers);
+        const productosIntercambio = todosProductos.filter(producto => (producto.destino == "Intercambio") && (producto.estado_producto.nombre != "Inactivo") && (producto.propietario.id != Number(id)));
+        return productosIntercambio;
+    }
+
     async getProductosVentaPropietario(id: string, token: string): Promise<Producto[]> {
         const headers = { Authorization: `Bearer ${token}`};
         const todosProductos = await this.utilsService.SendGet<Producto[]>(process.env.AUREX_MID_AUREX_CRUD_URL, "producto", headers);

@@ -1,5 +1,5 @@
 import { Controller, Get, Headers, HttpStatus, Param, Res, UseGuards } from '@nestjs/common';
-import { Response } from 'express';
+import { response, Response } from 'express';
 import { AutenticacionGuard } from 'src/guards/autenticacion.guard';
 import { ProductoService } from 'src/services/producto.service';
 
@@ -17,6 +17,20 @@ export class ProductoController {
             const dataProductosVenta = await this.productoService.getProductosVenta(token);
             response.status(HttpStatus.OK);
             response.json({ Data: dataProductosVenta, Message: 'Los productos en venta han sido cargados exitosamente.', Status: HttpStatus.OK, Success: true });
+        } catch (error) {
+            response.status(HttpStatus.INTERNAL_SERVER_ERROR);
+            response.json({ Data: [], Message: 'Error interno del servidor.', Status: HttpStatus.INTERNAL_SERVER_ERROR, Success: false });
+        }
+    }
+
+    @UseGuards(AutenticacionGuard)
+    @Get("/intercambio/:id")
+    async getProductosIntercambio(@Res() response: Response, @Param('id') id: string, @Headers('Authorization') authHeader: string) {
+        try {
+            const token = authHeader.split(' ')[1];
+            const dataProductosIntercambio = await this.productoService.getProductosIntercambio(id, token);
+            response.status(HttpStatus.OK);
+            response.json({ Data: dataProductosIntercambio, Message: 'Los productos en intercambio han sido cargados exitosamente.', Status: HttpStatus.OK, Success: true });
         } catch (error) {
             response.status(HttpStatus.INTERNAL_SERVER_ERROR);
             response.json({ Data: [], Message: 'Error interno del servidor.', Status: HttpStatus.INTERNAL_SERVER_ERROR, Success: false });

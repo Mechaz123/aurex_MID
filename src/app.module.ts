@@ -19,6 +19,8 @@ import { CreditoController } from './controllers/credito.controller';
 import { CreditoService } from './services/credito.service';
 import { PedidoController } from './controllers/pedido.controller';
 import { PedidoService } from './services/pedido.service';
+import { IntercambioController } from './controllers/intercambio.controller';
+import { IntercambioService } from './services/intercambio.service';
 
 @Module({
   imports: [
@@ -40,6 +42,7 @@ import { PedidoService } from './services/pedido.service';
     EmailController,
     CreditoController,
     PedidoController,
+    IntercambioController,
   ],
   providers: [
     AutenticacionService,
@@ -51,7 +54,8 @@ import { PedidoService } from './services/pedido.service';
     ProductoService,
     EmailService,
     CreditoService,
-    PedidoService
+    PedidoService,
+    IntercambioService,
   ],
 })
 
