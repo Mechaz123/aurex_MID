@@ -21,6 +21,8 @@ import { PedidoController } from './controllers/pedido.controller';
 import { PedidoService } from './services/pedido.service';
 import { IntercambioController } from './controllers/intercambio.controller';
 import { IntercambioService } from './services/intercambio.service';
+import { SubastaService } from './services/subasta.service';
+import { SubastaController } from './controllers/subasta.controller';
 
 @Module({
   imports: [
@@ -43,6 +45,7 @@ import { IntercambioService } from './services/intercambio.service';
     CreditoController,
     PedidoController,
     IntercambioController,
+    SubastaController
   ],
   providers: [
     AutenticacionService,
@@ -56,6 +59,7 @@ import { IntercambioService } from './services/intercambio.service';
     CreditoService,
     PedidoService,
     IntercambioService,
+    SubastaService
   ],
 })
 
