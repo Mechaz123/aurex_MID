@@ -13,6 +13,26 @@ export class SubastaService {
         private readonly emailService: EmailService
     ) { }
 
+    async SubastasPropietario(id: string, token: string): Promise<any> {
+        const headers = { Authorization: `Bearer ${token}` };
+        const todosSubasta = await this.utilsService.SendGet<Subasta[]>(process.env.AUREX_MID_AUREX_CRUD_URL, "subasta", headers);
+
+        if (todosSubasta) {
+            const subastasPropietario = todosSubasta.filter(subasta => (subasta.producto.propietario.id == Number(id)));
+            const todasPujasSubasta = await this.utilsService.SendGet<Puja[]>(process.env.AUREX_MID_AUREX_CRUD_URL, "puja", headers);
+
+            if (todasPujasSubasta) {
+                for (const subasta of subastasPropietario) {
+                    const pujas = todasPujasSubasta.filter(puja => (puja.subasta.id == subasta.id));
+                    (subasta as any).pujas = pujas;
+                }
+            }
+            return subastasPropietario as any[];
+        } else {
+            throw new Error("No se pudo consultar las subastas.");
+        }
+    }
+
     async Comprobar(token: string) {
         const headers = { Authorization: `Bearer ${token}` };
         const todosSubasta = await this.utilsService.SendGet<Subasta[]>(process.env.AUREX_MID_AUREX_CRUD_URL, "subasta", headers);

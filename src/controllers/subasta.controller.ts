@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Headers, HttpStatus, Post, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Headers, HttpStatus, Param, Post, Res, UseGuards } from '@nestjs/common';
 import { Response } from 'express';
 import { AutenticacionGuard } from 'src/guards/autenticacion.guard';
 import { SubastaService } from 'src/services/subasta.service';
@@ -8,6 +8,20 @@ export class SubastaController {
     constructor(
         private readonly subastaService: SubastaService
     ) { }
+
+    @UseGuards(AutenticacionGuard)
+    @Get("/propietario/:id")
+    async getSubastasPropietario(@Res() response: Response, @Param('id') id: string, @Headers('Authorization') authHeader: string) {
+        try {
+            const token = authHeader.split(' ')[1];
+            const subastas = await this.subastaService.SubastasPropietario(id, token);
+            response.status(HttpStatus.OK);
+            response.json({ Data: subastas, Message: 'Las subastas asociadas al propietario del producto, se han cargado exitosamente.', Status: HttpStatus.OK, Success: true });
+        } catch (error) {
+            response.status(HttpStatus.INTERNAL_SERVER_ERROR);
+            response.json({ Data: [], Message: 'Error interno del servidor.', Status: HttpStatus.INTERNAL_SERVER_ERROR, Success: false });
+        }
+    }
 
     @UseGuards(AutenticacionGuard)
     @Get("/comprobar")
