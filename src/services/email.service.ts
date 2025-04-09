@@ -64,6 +64,10 @@ export class EmailService {
             html = this.loadHtmlTemplate("solicitud_intercambio_rechazada", content);
         } else if (subject == "SOLICITUD DE INTERCAMBIO ACEPTADA") {
             html = this.loadHtmlTemplate("solicitud_intercambio_aceptada", content);
+        } else if (subject == "GANADOR DE LA SUBASTA") {
+            html = this.loadHtmlTemplate("ganador_subasta", content);
+        } else if (subject == "ENTREGAR PRODUCTO DE SUBASTA") {
+            html = this.loadHtmlTemplate("entrega_producto_subasta", content);
         }
 
         const mailOptions = {

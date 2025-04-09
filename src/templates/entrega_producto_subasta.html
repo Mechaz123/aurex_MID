@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aurex</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #D8291E;
+            color: white;
+            text-align: center;
+            padding: 10px;
+        }
+        .content {
+            background-color: #f4f4f4;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        .footer {
+            text-align: center;
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>AUREX</h1>
+    </div>
+    
+    <div class="content">
+        <h2>¡📦 GANADOR DE LA SUBASTA 📦!</h2>
+        
+        <p>Señor vendedor, el producto <b>{{ nombre_producto }}</b> que fue subastado por un valor de {{ valor_subasta }}, ya tiene un ganador,
+             adicional a esto la plata ha sido agregada a su cuenta, por lo cual usted debe realizar la entrega a la siguiente dirección <b>{{ entrega }}</b></p>
+
+        <p>Recuerde que el producto debe ser entregado en los proximos días.</p>
+        
+        <p>Atentamente,<br>
+        Administración Plataforma Aurex<br>
+        Transacciones seguras.</p>
+    </div>
+    
+    <div class="footer">
+        <p>© 2025 Aurex. Todos los derechos reservados.</p>
+        <p>Este es un mensaje automático. Por favor, no responda a este correo.</p>
+    </div>
+</body>
+</html>

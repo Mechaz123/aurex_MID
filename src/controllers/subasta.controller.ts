@@ -1,4 +1,4 @@
-import { Controller, Get, Headers, HttpStatus, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Headers, HttpStatus, Post, Res, UseGuards } from '@nestjs/common';
 import { Response } from 'express';
 import { AutenticacionGuard } from 'src/guards/autenticacion.guard';
 import { SubastaService } from 'src/services/subasta.service';
@@ -34,6 +34,20 @@ export class SubastaController {
         } catch (error) {
             response.status(HttpStatus.INTERNAL_SERVER_ERROR);
             response.json({ Data: [], Message: 'Error interno del servidor.', Status: HttpStatus.INTERNAL_SERVER_ERROR, Success: false });
+        }
+    }
+
+    @UseGuards(AutenticacionGuard)
+    @Post("/registrar_puja")
+    async postRegistrarPuja(@Res() response: Response, @Body() body: Partial<any>, @Headers('Authorization') authHeader: string) {
+        try {
+            const token = authHeader.split(' ')[1];
+            await this.subastaService.RegistrarPuja(body, token);
+            response.status(HttpStatus.OK);
+            response.json({ Data: true, Message: 'La puja ha sido registrada exitosamente.', Status: HttpStatus.OK, Success: true });
+        } catch (error) {
+            response.status(HttpStatus.INTERNAL_SERVER_ERROR);
+            response.json({ Data: false, Message: `El body contiene errores u ocurrió un error interno en el servidor(${error}).`, Status: HttpStatus.INTERNAL_SERVER_ERROR, Success: false });
         }
     }
 }
